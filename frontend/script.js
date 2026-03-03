@@ -57,9 +57,12 @@ if (form) {
 async function loadDonations() {
   const donationList = document.getElementById("donationList");
   if (!donationList) return;
-
   try {
-    const res = await fetch(`${API_URL}/donations`);
+      const res = await fetch(`${API_URL}/donations`, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
     if (!res.ok) throw new Error(`Server responded with ${res.status}`);
 
     const donations = await res.json();
