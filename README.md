@@ -71,8 +71,8 @@ REPLATE/
    Create a `.env` file inside the `backend/` folder with the following values:
 
    ```env
-   MONGO_URI=mongodb://localhost:27017/food_db
-   PORT=4000
+   MONGO_URI= your_mongodb_cluster_uri
+   JWT_SECRET=your_secret_token
 
 4. Run backend and frontend
    - Start backend:
@@ -81,10 +81,8 @@ REPLATE/
    - Start frontend: Open frontend/homePage.html with Live Server in VS Code
 Frontend runs on http://127.0.0.1:5500 (default Live Server port)
 
-## 🚀 Deployment (Future Work)
-- Planned deployment on cloud platforms ( Render + MongoDB Atlas).
-- Frontend hosting on GitHub Pages
-
-## demo : 
-
-https://drive.google.com/file/d/1TnGRvgW64KDk6aRQKh-OMsI0vFIXeL1A/view?usp=drive_link
+## 🚀 Deployment :
+   - Deployed backend and frontend on Render (Web Hosting Platform) 
+ 
+## 🎥 Live Demo
+[RePlate Project on Render](https://replateproject.onrender.com/)

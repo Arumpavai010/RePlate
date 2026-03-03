@@ -1,6 +1,14 @@
 import mongoose from "mongoose";
 
 const donationSchema = new mongoose.Schema({
+  donorId:{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true 
+  },
+  receiverId: {
+     type: mongoose.Schema.Types.ObjectId,
+    ref: "User" },
   donor: {
     type: String,
     required: true,

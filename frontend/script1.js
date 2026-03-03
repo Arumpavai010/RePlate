@@ -1,3 +1,5 @@
+const API_URL = "https://replate-ttjj.onrender.com/api";
+
 // Register
 async function register() {
   let user = document.getElementById("regUser").value;
@@ -10,7 +12,7 @@ async function register() {
   }
 
   try {
-    const res = await fetch("https://replate-ttjj.onrender.com/api/users/register", {
+    const res = await fetch(`${API_URL}/users/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username: user, password: pass })
@@ -34,26 +36,31 @@ async function register() {
 }
 
 // Login
-
 async function login() {
   let user = document.getElementById("loginUser").value;
   let pass = document.getElementById("loginPass").value;
   let msg = document.getElementById("msg");
 
   try {
-    const res = await fetch("https://replate-ttjj.onrender.com/api/users/login", {
+    const res = await fetch(`${API_URL}/users/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: user, password: pass }) // ✅ no contact info
+      body: JSON.stringify({ username: user, password: pass })
     });
     const data = await res.json();
 
-    if (data.success) {
+    console.log("Login response:", data); // ✅ Debug
+
+    if (data.success && data.token) {
       msg.style.color = "green";
       msg.textContent = "Login successful!";
 
+      // ✅ Save token for protected routes
+      localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.user.id);
       localStorage.setItem("username", data.user.username);
+
+      console.log("Saved token:", localStorage.getItem("token")); // Debug
 
       setTimeout(() => {
         window.location.href = "index.html";
@@ -69,8 +76,8 @@ async function login() {
 }
 
 // Logout
-
 function logout() {
+  localStorage.removeItem("token");
   localStorage.removeItem("userId");
   localStorage.removeItem("username");
   window.location.href = "index.html";

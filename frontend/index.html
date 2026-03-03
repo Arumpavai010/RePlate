@@ -185,7 +185,7 @@ html {
     </div>
 </nav>
 
-<!--  HOME PAGE  -->
+<!-- HOME PAGE -->
 <div id="homePage">
 
 <section class="hero">
@@ -193,8 +193,7 @@ html {
         <h1>Reduce Food Waste, <span>Feed Hope</span></h1>
         <p>Join our platform connecting food donors with NGOs and volunteers to reduce food wastage and improve food accessibility.</p>
         <div class="hero-buttons">
-
-<!-- Donate button protected -->
+            <!-- Donate button protected -->
             <button class="btn btn-primary" id="donateBtn">Donate Food</button>
             <button class="btn btn-outline" onclick="window.location.href='register.html'" id="becomeDonorBtn">Become a Donor</button>
         </div>
@@ -236,6 +235,7 @@ html {
 <script>
 function loadHome() {
   const user = localStorage.getItem("username");
+  const token = localStorage.getItem("token"); // ✅ check token too
 
   const logo = document.querySelector(".logo");
   const loginLink = document.getElementById("loginLink");
@@ -247,7 +247,7 @@ function loadHome() {
   const donateBtn = document.getElementById("donateBtn");
   const donateNowBtn = document.getElementById("donateNowBtn");
 
-  if (user) {
+  if (user && token) {
     logo.textContent = "💚 RePlate : Welcome, " + user;
     if (loginLink) loginLink.style.display = "none";
     if (registerLink) registerLink.style.display = "none";
@@ -260,7 +260,6 @@ function loadHome() {
     if (donateBtn) donateBtn.onclick = () => window.location.href = "donor.html";
     if (donateNowBtn) donateNowBtn.onclick = () => window.location.href = "donor.html";
   } else {
-
     logo.textContent = "💚 RePlate";
 
     if (loginLink) loginLink.style.display = "inline-block";

@@ -1,7 +1,11 @@
 import express from "express";
-import { createDonation, getDonations, updateDonation } from "../controller/FoodController.js";
+import { createDonation, getDonations, claimDonation,EditDonation,getDonation,updateDonationStatus } from "../controller/FoodController.js";
 const router = express.Router();
-router.post("/", createDonation);
+import { authMiddleware } from "../middleware/auth.js";
+router.post("/", authMiddleware, createDonation);
 router.get("/", getDonations);
-router.put("/:id", updateDonation);
+router.get("/:id", authMiddleware, getDonation);
+router.put("/:id/edit", authMiddleware, EditDonation);
+router.put("/:id/claim", authMiddleware, claimDonation);
+router.put("/:id/status", authMiddleware, updateDonationStatus);
 export default router;

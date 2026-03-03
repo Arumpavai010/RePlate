@@ -3,6 +3,16 @@
 <head>
     <title>Donor - Food Donation</title>
     <link rel="stylesheet" href="style.css">
+    <script>
+      // ✅ Redirect if not logged in
+      (function checkAuth() {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          alert("Please log in first.");
+          window.location.href = "loginPage.html";
+        }
+      })();
+    </script>
 </head>
 <body>
 <header>

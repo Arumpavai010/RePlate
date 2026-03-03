@@ -9,10 +9,13 @@
 <div class="container">
     <h2>Register</h2>
 
-    <input type="text" id="regUser" placeholder="Username" required>
-    <input type="password" id="regPass" placeholder="Password" required>
+    <!-- Proper form setup -->
+    <form onsubmit="register(); return false;">
+        <input type="text" id="regUser" placeholder="Username" required>
+        <input type="password" id="regPass" placeholder="Password" required>
+        <button type="submit">Register</button>
+    </form>
 
-    <button onclick="register()">Register</button>
     <p id="regMsg"></p>
 
     <p>

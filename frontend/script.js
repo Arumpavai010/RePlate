@@ -1,3 +1,8 @@
+// script.js
+
+const API_URL = "https://replate-ttjj.onrender.com/api";
+const token = localStorage.getItem("token");
+
 // Donor Page Elements
 const donorName = document.getElementById("donorName");
 const foodName = document.getElementById("foodName");
@@ -17,7 +22,6 @@ if (form) {
     const donation = {
       donor: donorName.value.trim(),
       contactInfo: document.getElementById("contactInfo").value.trim(),
-      userId: localStorage.getItem("userId"),
       food: foodName.value.trim(),
       qty: parseInt(quantity.value, 10),
       prepTime: preparedTime.value,
@@ -25,14 +29,16 @@ if (form) {
       location: locationInput.value.trim(),
       lat: latitude.value ? parseFloat(latitude.value) : null,
       lon: longitude.value ? parseFloat(longitude.value) : null,
-      status: "Pending",
-      createdAt: new Date().toISOString()
+      status: "Pending"
     };
 
     try {
-      const res = await fetch("https://replate-ttjj.onrender.com/api/donations", {
+      const res = await fetch(`${API_URL}/donations`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}` // ✅ send JWT
+        },
         body: JSON.stringify(donation)
       });
 
@@ -49,18 +55,16 @@ if (form) {
 }
 
 // Receiver Page: Load Pending + Requested Donations
-
 async function loadDonations() {
   const donationList = document.getElementById("donationList");
   if (!donationList) return;
 
   try {
-    const res = await fetch("https://replate-ttjj.onrender.com/api/donations");
+    const res = await fetch(`${API_URL}/donations`);
     if (!res.ok) throw new Error(`Server responded with ${res.status}`);
 
     const donations = await res.json();
 
-    // Show Pending + Requested
     const visibleDonations = donations.filter(
       d => d.status === "Pending" || d.status === "Requested"
     );
@@ -84,7 +88,6 @@ async function loadDonations() {
           ? "donation-card expired"
           : `donation-card ${risk.toLowerCase()}`;
 
-      // ---------- MAP LINK ----------
       let mapLink = "";
       if (donation.lat !== null && donation.lon !== null) {
         mapLink = `
@@ -104,7 +107,6 @@ async function loadDonations() {
           </p>`;
       }
 
-      // ---------- STATUS BADGE ----------
       let statusBadge = "";
       if (donation.status === "Pending") {
         statusBadge = `<span style="color:white; background:#10b981; padding:2px 8px; border-radius:6px;">PENDING</span>`;
@@ -112,7 +114,6 @@ async function loadDonations() {
         statusBadge = `<span style="color:white; background:#f59e0b; padding:2px 8px; border-radius:6px;">REQUESTED</span>`;
       }
 
-      // ---------- STATUS DROPDOWN ----------
       const statusDropdown = `
         <label><b>Update Status:</b></label>
         <select onchange="updateDonationStatus('${donation._id}', this.value)">
@@ -120,6 +121,10 @@ async function loadDonations() {
           <option value="Requested" ${donation.status === "Requested" ? "selected" : ""}>Requested</option>
           <option value="Collected" ${donation.status === "Collected" ? "selected" : ""}>Collected</option>
         </select>
+      `;
+
+      const claimBtn = `
+        <button onclick="claimDonation('${donation._id}')">Claim</button>
       `;
 
       card.innerHTML = `
@@ -133,6 +138,7 @@ async function loadDonations() {
         <p><b>Status:</b> ${statusBadge}</p>
         ${mapLink}
         ${statusDropdown}
+        ${claimBtn}
       `;
 
       donationList.appendChild(card);
@@ -143,14 +149,16 @@ async function loadDonations() {
 }
 
 // Update Donation Status
-
 async function updateDonationStatus(donationId, newStatus) {
   try {
     const res = await fetch(
-      `https://replate-ttjj.onrender.com/api/donations/${donationId}`,
+      `${API_URL}/donations/${donationId}/status`,
       {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}` // ✅ send JWT
+        },
         body: JSON.stringify({ status: newStatus })
       }
     );
@@ -158,7 +166,6 @@ async function updateDonationStatus(donationId, newStatus) {
     if (!res.ok) throw new Error(`Server responded with ${res.status}`);
 
     await res.json();
-
     alert(`Donation status updated to ${newStatus}`);
     loadDonations();
   } catch (err) {
@@ -166,8 +173,30 @@ async function updateDonationStatus(donationId, newStatus) {
   }
 }
 
-// Calculate Expiry
+// Claim Donation
+async function claimDonation(donationId) {
+  try {
+    const res = await fetch(
+      `${API_URL}/donations/${donationId}/claim`,
+      {
+        method: "PUT",
+        headers: {
+          "Authorization": `Bearer ${token}` // ✅ send JWT
+        }
+      }
+    );
 
+    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+
+    const data = await res.json();
+    alert(data.message || "Donation claimed!");
+    loadDonations();
+  } catch (err) {
+    alert("Error claiming donation: " + err.message);
+  }
+}
+
+// Calculate Expiry
 function calculateExpiry(time, hours) {
   const [h, m] = time.split(":").map(Number);
   const prepDate = new Date();
@@ -176,7 +205,6 @@ function calculateExpiry(time, hours) {
 }
 
 // Risk Level
-
 function getRisk(hoursLeft) {
   if (hoursLeft <= 0) return "EXPIRED";
   if (hoursLeft > 2) return "LOW";
@@ -185,7 +213,6 @@ function getRisk(hoursLeft) {
 }
 
 // GPS Location + Address Conversion
-
 async function getLocation() {
   if (!navigator.geolocation) {
     alert("Geolocation not supported");
@@ -202,7 +229,6 @@ async function getLocation() {
       const res = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
       );
-     
       const data = await res.json();
 
       locationInput.value =
