@@ -21,7 +21,7 @@
 async function loadAllDonations() {
   const list = document.getElementById("allDonationList");
   try {
-    const res = await fetch("https://replate-ttjj.onrender.com/api/donations");
+    const res = await fetch("https://replate-ttjj-d8mh.onrender.com/api/donations");
     const donations = await res.json();
 
     if (!Array.isArray(donations) || donations.length === 0) {

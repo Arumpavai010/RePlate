@@ -1,6 +1,5 @@
 // script.js
-
-const API_URL = "https://replate-ttjj.onrender.com/api";
+const API_URL = "https://replate-ttjj-d8mh.onrender.com/api";
 const token = localStorage.getItem("token");
 
 // Donor Page Elements
