@@ -1,4 +1,3 @@
-// script.js
 const API_URL = "https://replate-ttjj-d8mh.onrender.com/api";
 const token = localStorage.getItem("token");
 
@@ -12,6 +11,21 @@ const locationInput = document.getElementById("location");
 const latitude = document.getElementById("latitude");
 const longitude = document.getElementById("longitude");
 const form = document.getElementById("donationForm");
+
+// Helper: handle fetch errors gracefully
+async function handleResponse(res) {
+  if (!res.ok) {
+    let msg = `Server responded with ${res.status}`;
+    try {
+      const data = await res.json();
+      if (data.message) msg = data.message;
+    } catch {
+      // ignore if body isn't JSON
+    }
+    throw new Error(msg);
+  }
+  return res.json();
+}
 
 // Donor Page: Submit Donation
 if (form) {
@@ -36,17 +50,14 @@ if (form) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}` // ✅ send JWT
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(donation)
       });
 
-      if (!res.ok) throw new Error(`Server responded with ${res.status}`);
-
-      await res.json();
+      await handleResponse(res);
       alert("Donation Submitted Successfully!");
       form.reset();
-
     } catch (err) {
       alert("Error submitting donation: " + err.message);
     }
@@ -58,14 +69,10 @@ async function loadDonations() {
   const donationList = document.getElementById("donationList");
   if (!donationList) return;
   try {
-      const res = await fetch(`${API_URL}/donations`, {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      });
-    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
-
-    const donations = await res.json();
+    const res = await fetch(`${API_URL}/donations`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const donations = await handleResponse(res);
 
     const visibleDonations = donations.filter(
       d => d.status === "Pending" || d.status === "Requested"
@@ -95,17 +102,13 @@ async function loadDonations() {
         mapLink = `
           <p>
             <a href="https://www.google.com/maps/search/?api=1&query=${Number(donation.lat)},${Number(donation.lon)}"
-               target="_blank">
-               View on Map
-            </a>
+               target="_blank">View on Map</a>
           </p>`;
       } else if (donation.location) {
         mapLink = `
           <p>
             <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(donation.location)}"
-               target="_blank">
-               View on Map
-            </a>
+               target="_blank">View on Map</a>
           </p>`;
       }
 
@@ -125,9 +128,7 @@ async function loadDonations() {
         </select>
       `;
 
-      const claimBtn = `
-        <button onclick="claimDonation('${donation._id}')">Claim</button>
-      `;
+      const claimBtn = `<button onclick="claimDonation('${donation._id}')">Claim</button>`;
 
       card.innerHTML = `
         <h3>${donation.food}</h3>
@@ -153,21 +154,16 @@ async function loadDonations() {
 // Update Donation Status
 async function updateDonationStatus(donationId, newStatus) {
   try {
-    const res = await fetch(
-      `${API_URL}/donations/${donationId}/status`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}` // ✅ send JWT
-        },
-        body: JSON.stringify({ status: newStatus })
-      }
-    );
+    const res = await fetch(`${API_URL}/donations/${donationId}/status`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ status: newStatus })
+    });
 
-    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
-
-    await res.json();
+    await handleResponse(res);
     alert(`Donation status updated to ${newStatus}`);
     loadDonations();
   } catch (err) {
@@ -178,19 +174,12 @@ async function updateDonationStatus(donationId, newStatus) {
 // Claim Donation
 async function claimDonation(donationId) {
   try {
-    const res = await fetch(
-      `${API_URL}/donations/${donationId}/claim`,
-      {
-        method: "PUT",
-        headers: {
-          "Authorization": `Bearer ${token}` // ✅ send JWT
-        }
-      }
-    );
+    const res = await fetch(`${API_URL}/donations/${donationId}/claim`, {
+      method: "PUT",
+      headers: { "Authorization": `Bearer ${token}` }
+    });
 
-    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
-
-    const data = await res.json();
+    const data = await handleResponse(res);
     alert(data.message || "Donation claimed!");
     loadDonations();
   } catch (err) {
