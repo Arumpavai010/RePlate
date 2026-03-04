@@ -13,6 +13,11 @@
     <form onsubmit="register(); return false;">
         <input type="text" id="regUser" placeholder="Username" required>
         <input type="password" id="regPass" placeholder="Password" required>
+        <label for="regRole">Select Role</label>
+            <select id="regRole" required>
+            <option value="donor">Donor</option>
+            <option value="receiver">Receiver</option>
+            </select>
         <button type="submit">Register</button>
     </form>
 
@@ -22,6 +27,7 @@
         Already registered?
         <a href="loginPage.html">Login</a>
     </p>
+    
 </div>
 </div>
 <script src="script1.js"></script>

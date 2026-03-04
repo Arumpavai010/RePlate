@@ -6,7 +6,7 @@ import router from './routes/FoodRoute.js';
 import cors from 'cors';
 import Userrouter from './routes/UserRoutes.js';
 const app = express();
-app.use(cors());
+app.use(cors({origin : "https://replateproject.onrender.com"}));
 app.use(express.json());
 app.use('/api/donations', router);
 app.use("/api/users", Userrouter);

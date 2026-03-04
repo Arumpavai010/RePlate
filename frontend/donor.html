@@ -1,63 +1,74 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Donor - Food Donation</title>
-    <link rel="stylesheet" href="style.css">
-    <script>
-      // ✅ Redirect if not logged in
-      (function checkAuth() {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          alert("Please log in first.");
-          window.location.href = "loginPage.html";
-        }
-      })();
-    </script>
+  <title>Donor - Food Donation</title>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    // ✅ Redirect if not logged in
+    (function checkAuth() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Please log in first.");
+        window.location.href = "loginPage.html";
+      }
+    })();
+  </script>
 </head>
 <body>
 <header>
-    <h1>Donor Dashboard</h1>
-    <a href="receiver.html"><button>Go to Receiver Page</button></a>
+  <h1>Donor Dashboard</h1>
+  <a href="receiver.html"><button>Go to Receiver Page</button></a>
 </header>
 
 <section>
-    <h2>Donate Food</h2>
+  <h2>Donate Food</h2>
+  <form id="donationForm">
+    <label for="donorName">Donor Name</label>
+    <input type="text" id="donorName" placeholder="Enter your name" required>
 
-    <form id="donationForm">
-        <label for="donorName">Donor Name</label>
-        <input type="text" id="donorName" placeholder="Enter your name" required>
+    <label for="contactInfo">Contact Info</label>
+    <input type="text" id="contactInfo" placeholder="Phone or Email" required>
 
-        <label for="contactInfo">Contact Info</label>
-        <input type="text" id="contactInfo" placeholder="Phone or Email" required>
+    <label for="foodName">Food Name</label>
+    <input type="text" id="foodName" placeholder="Food type" required>
 
-        <label for="foodName">Food Name</label>
-        <input type="text" id="foodName" placeholder="Food type" required>
+    <label for="quantity">Quantity (meals)</label>
+    <input type="number" id="quantity" placeholder="Number of meals" required>
 
-        <label for="quantity">Quantity (meals)</label>
-        <input type="number" id="quantity" placeholder="Number of meals" required>
+    <label for="preparedTime">Prepared Time</label>
+    <input type="time" id="preparedTime" required>
 
-        <label for="preparedTime">Prepared Time</label>
-        <input type="time" id="preparedTime" required>
+    <label for="foodType">Food Type</label>
+    <select id="foodType">
+      <option value="4">Cooked (4 hrs safe)</option>
+      <option value="8">Packed (8 hrs safe)</option>
+    </select>
 
-        <label for="foodType">Food Type</label>
-        <select id="foodType">
-            <option value="4">Cooked (4 hrs safe)</option>
-            <option value="8">Packed (8 hrs safe)</option>
-        </select>
+    <label for="location">Pickup Location</label>
+    <div class="location-container">
+      <input type="text" id="location" placeholder="Location" required>
+      <button type="button" onclick="getLocation()">Use My Location</button>
+    </div>
 
-        <label for="location">Pickup Location</label>
-        <div class="location-container">
-            <input type="text" id="location" placeholder="Location" required>
-            <button type="button" onclick="getLocation()">Use My Location</button>
-        </div>
+    <input type="hidden" id="latitude">
+    <input type="hidden" id="longitude">
 
-        <input type="hidden" id="latitude">
-        <input type="hidden" id="longitude">
+    <button type="submit">Submit Donation</button>
+  </form>
+</section>
 
-        <button type="submit">Submit Donation</button>
-    </form>
+<section>
+  <h2>My Donations</h2>
+  <div id="myDonationList"></div>
 </section>
 
 <script src="script.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // ✅ Only run after page is fully loaded
+    loadMyDonations();
+  });
+</script>
+
 </body>
 </html>

@@ -16,7 +16,6 @@
   <div id="allDonationList"></div>
 </section>
 
-<script src="script.js"></script>
 <script>
 async function loadAllDonations() {
   const list = document.getElementById("allDonationList");
@@ -33,18 +32,20 @@ async function loadAllDonations() {
     donations.forEach(donation => {
       const card = document.createElement("div");
       card.className = "donation-card";
+
       card.innerHTML = `
         <h3>${donation.food}</h3>
-        <p><b>Donor:</b> ${donation.donor}</p>
+        <p><b>Donor:</b> ${donation.donorId?.username || donation.donor}</p>
         <p><b>Contact:</b> ${donation.contactInfo || "N/A"}</p>
         <p><b>Quantity:</b> ${donation.qty || "N/A"} meals</p>
-      <p><b>Location:</b> ${
-  donation.location ||
-  (donation.lat && donation.lon
-    ? `${donation.lat.toFixed(4)}, ${donation.lon.toFixed(4)}`
-    : "N/A")
-}</p>
+        <p><b>Location:</b> ${
+          donation.location ||
+          (donation.lat && donation.lon
+            ? `${donation.lat.toFixed(4)}, ${donation.lon.toFixed(4)}`
+            : "N/A")
+        }</p>
         <p><b>Status:</b> ${donation.status}</p>
+        <p><b>Claimed By:</b> ${donation.receiverId?.username || "Not yet claimed"}</p>
         ${donation.lat && donation.lon ? 
           `<p><a href="https://www.google.com/maps/search/?api=1&query=${donation.lat},${donation.lon}" target="_blank">View on Map</a></p>` : ""}
       `;

@@ -133,6 +133,10 @@ background:white;
     justify-content:center;
     gap:20px;
 }
+#logoutBtn {
+  background-color: #d32f2f; /* red */
+  color: white;
+}
 footer{
 padding:40px 0;
     text-align:center;
@@ -170,7 +174,7 @@ html {
 
 <div class="container">
 
-<nav>
+<nav role="navigation">
     <div class="logo">💚 RePlate</div>
     <ul>
         <li><a href="#mission" id="aboutLink" class="active">About</a></li>
@@ -181,7 +185,7 @@ html {
     </ul>
     <div>
         <button class="btn btn-primary" onclick="window.location.href='register.html'" id="getStartedBtn">Get Started</button>
-        <button class="btn btn-outline" onclick="logout()" id="logoutBtn" style="display:none;">Logout</button>
+        <button class="btn btn-outline" onclick="logout()" id="logoutBtn" style="display:none;" aria-label="Logout">Logout</button>
     </div>
 </nav>
 
@@ -198,7 +202,7 @@ html {
             <button class="btn btn-outline" onclick="window.location.href='register.html'" id="becomeDonorBtn">Become a Donor</button>
         </div>
     </div>
-    <img src="homepageBG.jpeg" alt="Food Illustration">
+    <img src="homepageBG.jpeg" alt="Illustration of food donation and community support">
 </section>
 
 <section class="section" id="mission">
@@ -231,7 +235,7 @@ html {
 
 </div>
 
-<script src="script1.js"></script>
+<!-- Inline script -->
 <script>
 function loadHome() {
   const user = localStorage.getItem("username");
@@ -273,6 +277,14 @@ function loadHome() {
     if (donateBtn) donateBtn.onclick = () => window.location.href = "loginPage.html";
     if (donateNowBtn) donateNowBtn.onclick = () => window.location.href = "loginPage.html";
   }
+}
+
+// Simple logout function
+function logout() {
+  localStorage.removeItem("username");
+  localStorage.removeItem("token");
+  alert("Logged out successfully!");
+  window.location.href = "index.html";
 }
 </script>
 </body>

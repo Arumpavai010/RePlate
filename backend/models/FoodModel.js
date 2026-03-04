@@ -49,7 +49,10 @@ const donationSchema = new mongoose.Schema({
     type: String,
     enum: ["Pending", "Requested", "Collected"],
     default: "Pending"
-  }
-}, { timestamps: true });
+  },
+  claimedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
+}},{ timestamps: true });
 
 export default mongoose.model("Donation", donationSchema);

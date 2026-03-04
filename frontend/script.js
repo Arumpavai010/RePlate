@@ -130,6 +130,12 @@ async function loadDonations() {
 
       const claimBtn = `<button onclick="claimDonation('${donation._id}')">Claim</button>`;
 
+      // ✅ Edit button only for the receiver who claimed this donation
+      const userId = localStorage.getItem("userId");
+      const editBtn = donation.receiverId?._id === userId
+        ? `<button onclick="editDonation('${donation._id}')">Edit</button>`
+        : "";
+
       card.innerHTML = `
         <h3>${donation.food}</h3>
         <p><b>Donor:</b> ${donation.donor}</p>
@@ -142,6 +148,7 @@ async function loadDonations() {
         ${mapLink}
         ${statusDropdown}
         ${claimBtn}
+        ${editBtn}
       `;
 
       donationList.appendChild(card);
@@ -176,14 +183,38 @@ async function claimDonation(donationId) {
   try {
     const res = await fetch(`${API_URL}/donations/${donationId}/claim`, {
       method: "PUT",
-      headers: { "Authorization": `Bearer ${token}` }
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
     });
-
-    const data = await handleResponse(res);
-    alert(data.message || "Donation claimed!");
+    await handleResponse(res);
+    alert("Donation claimed successfully!");
     loadDonations();
   } catch (err) {
     alert("Error claiming donation: " + err.message);
+  }
+}
+
+// ✅ Edit Donation
+async function editDonation(donationId) {
+  const newQty = prompt("Enter new quantity:");
+  if (!newQty) return;
+
+  try {
+    const res = await fetch(`${API_URL}/donations/${donationId}/edit`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ qty: parseInt(newQty, 10) })
+    });
+
+    await handleResponse(res);
+    alert("Donation updated successfully!");
+    loadDonations();
+  } catch (err) {
+    alert("Error editing donation: " + err.message);
   }
 }
 
@@ -218,7 +249,7 @@ async function getLocation() {
 
     try {
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
       );
       const data = await res.json();
 
@@ -232,4 +263,61 @@ async function getLocation() {
       locationInput.value = "Detected Location";
     }
   });
+}
+
+async function loadMyDonations() {
+  const myDonationList = document.getElementById("myDonationList");
+  if (!myDonationList) return;
+
+  const userId = localStorage.getItem("userId"); // ✅ logged-in donor ID
+
+  try {
+    const res = await fetch(`${API_URL}/donations`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const donations = await handleResponse(res);
+
+    // 🔎 Debug logs
+    console.log("Fetched donations:", donations);
+    console.log("Logged-in userId:", userId);
+
+    // ✅ Filter only donations created by this donor
+const myDonations = donations.filter(d =>
+  d.donorId === userId || (d.donorId && d.donorId._id === userId)
+);
+
+    if (myDonations.length === 0) {
+      myDonationList.innerHTML =
+        `<p style="text-align:center;">You have not created any donations yet.</p>`;
+      return;
+    }
+
+    myDonationList.innerHTML = "";
+
+    myDonations.forEach((donation) => {
+      const expiry = calculateExpiry(donation.prepTime, donation.safeHours);
+      const hoursLeft = (expiry - new Date()) / 3600000;
+      const risk = getRisk(hoursLeft);
+
+      const card = document.createElement("div");
+      card.className =
+        hoursLeft <= 0
+          ? "donation-card expired"
+          : `donation-card ${risk.toLowerCase()}`;
+
+      card.innerHTML = `
+        <h3>${donation.food}</h3>
+        <p><b>Quantity:</b> ${donation.qty} meals</p>
+        <p><b>Location:</b> ${donation.location || "N/A"}</p>
+        <p><b>Expires in:</b> ${hoursLeft > 0 ? hoursLeft.toFixed(1) + " hrs" : "Expired"}</p>
+        <p><b>Risk Level:</b> ${risk}</p>
+        <p><b>Status:</b> ${donation.status}</p>
+        <button onclick="editDonation('${donation._id}')">Edit</button>
+      `;
+
+      myDonationList.appendChild(card);
+    });
+  } catch (err) {
+    alert("Error loading your donations: " + err.message);
+  }
 }

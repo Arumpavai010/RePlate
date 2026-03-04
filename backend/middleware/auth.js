@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/userInfo.js";
 
+// ✅ Authentication middleware
 export const authMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
@@ -22,4 +23,14 @@ export const authMiddleware = async (req, res, next) => {
   } catch (error) {
     res.status(401).json({ message: "Invalid token" });
   }
+};
+
+// ✅ Role-based middleware
+export const roleMiddleware = (requiredRole) => {
+  return (req, res, next) => {
+    if (!req.user || req.user.role !== requiredRole) {
+      return res.status(403).json({ message: `Access denied: requires ${requiredRole}` });
+    }
+    next();
+  };
 };
