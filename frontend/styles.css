@@ -11,79 +11,143 @@ body {
   background-attachment: fixed;
   color: #333;
 }
+
 body::before {
-    content: "";
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: -1;
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: -1;
 }
 
 .main-wrapper {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding-right: 120px;
-    background: transparent;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 120px;
+  background: transparent;
 }
 
 .container {
-    background: #ffffff;
-    width: 350px;
-    padding: 35px;
-    border-radius: 12px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-    text-align: center;
+  background: #ffffff;
+  width: 350px;
+  padding: 35px;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+  text-align: center;
 }
+
 .container h2 {
-    margin-bottom: 25px;
-    font-size: 24px;
-    color: #2e7d32;
+  margin-bottom: 25px;
+  font-size: 24px;
+  color: #2e7d32;
 }
 
 .container input {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 14px;
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
 }
 
 .container button {
-    width: 100%;
-    padding: 12px;
-    background: #2e7d32; 
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 15px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: 0.2s;
+  width: 100%;
+  padding: 12px;
+  background: #2e7d32; 
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
 }
+
 .container button:hover {
-    background: #69bf6e; 
-    transform: scale(1.03);
+  background: #69bf6e; 
+  transform: scale(1.03);
 }
 
 #msg, #regMsg {
-    margin-top: 12px;
-    font-size: 14px;
-    color: #b91c1c;
-    font-weight: 600;
+  margin-top: 12px;
+  font-size: 14px;
+  color: #b91c1c;
+  font-weight: 600;
 }
 
 .container p {
-    margin-top: 20px;
-    font-size: 14px;
+  margin-top: 20px;
+  font-size: 14px;
 }
+
 .container a {
-    color: #2e7d32;
-    text-decoration: none;
-    font-weight: 600;
+  color: #2e7d32;
+  text-decoration: none;
+  font-weight: 600;
 }
+
 .container a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
+}
+
+/* ✅ Responsive adjustments */
+@media (max-width: 768px) {
+  .main-wrapper {
+    justify-content: center;
+    padding-right: 0;
+    padding: 20px;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 400px;
+    padding: 25px;
+  }
+
+  .container h2 {
+    font-size: 20px;
+  }
+
+  .container input,
+  .container button {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 20px;
+    border-radius: 8px;
+  }
+
+  .container h2 {
+    font-size: 18px;
+  }
+
+  .container input,
+  .container button {
+    font-size: 13px;
+    padding: 8px;
+  }
+}
+
+select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: #fff;
+  color: #333;
+  cursor: pointer;
+  margin-bottom: 15px; /* ✅ adds space below dropdown */
+}
+
+select:focus {
+  border-color: #2e7d32; /* green highlight */
+  outline: none;
 }
