@@ -46,15 +46,20 @@ export const claimDonation = async (req, res) => {
     donation.status = "Requested";
     await donation.save();
 
-    const populated = await donation
+    // ✅ Re-query with populate
+    const populated = await Donation.findById(donation._id)
       .populate("donorId", "username")
       .populate("receiverId", "username");
-    res.status(200).json(populated);
+
+    return res.status(200).json({
+      message: "Donation claimed successfully",
+      donation: populated
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error in claimDonation:", error);
+    return res.status(500).json({ message: "Server error while claiming donation" });
   }
 };
-
 // ✅ Any authenticated user can view donations
 export const getDonations = async (req, res) => {
   try {
@@ -72,8 +77,11 @@ export const getDonations = async (req, res) => {
 export const updateDonationStatus = async (req, res) => {
   try {
     const donation = await Donation.findById(req.params.id);
-    if (!donation) return res.status(404).json({ message: "Donation not found" });
+    if (!donation) {
+      return res.status(404).json({ message: "Donation not found" });
+    }
 
+    // Only the receiver who claimed it can update
     if (donation.receiverId?.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: "Not authorized to update status" });
     }
@@ -81,12 +89,18 @@ export const updateDonationStatus = async (req, res) => {
     donation.status = req.body.status;
     await donation.save();
 
-    const populated = await donation
+    // ✅ Re-query with populate
+    const populated = await Donation.findById(donation._id)
       .populate("donorId", "username")
       .populate("receiverId", "username");
-    res.status(200).json(populated);
+
+    return res.status(200).json({
+      message: `Donation status updated to ${req.body.status}`,
+      donation: populated
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error updating donation status:", error);
+    return res.status(500).json({ message: "Server error while updating donation status" });
   }
 };
 
@@ -94,27 +108,38 @@ export const updateDonationStatus = async (req, res) => {
 export const EditDonation = async (req, res) => {
   try {
     const donation = await Donation.findById(req.params.id);
-    if (!donation) return res.status(404).json({ message: "Donation not found" });
+    if (!donation) {
+      return res.status(404).json({ message: "Donation not found" });
+    }
 
+    // ✅ Only the donor who created it can edit
     if (donation.donorId.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: "Not authorized to edit this donation" });
     }
 
-    const allowedUpdates = ["food", "qty", "prepTime", "safeHours", "location", "lat", "lon"];
-    Object.keys(req.body).forEach((key) => {
-      if (allowedUpdates.includes(key)) {
-        donation[key] = req.body[key];
-      }
-    });
+    // ✅ Only allow editing quantity with validation
+    const newQty = req.body.qty;
+    if (newQty === undefined || isNaN(newQty) || newQty <= 0) {
+      return res.status(400).json({ message: "Quantity must be a positive number" });
+    }
 
+    donation.qty = newQty;
     await donation.save();
-    const populated = await donation.populate("donorId", "username");
-    res.status(200).json(populated);
+
+    // ✅ Re-query with populate for clean response
+    const populated = await Donation.findById(donation._id)
+      .populate("donorId", "username")
+      .populate("receiverId", "username");
+
+    return res.status(200).json({
+      message: "Donation quantity updated successfully",
+      donation: populated
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error editing donation:", error);
+    return res.status(500).json({ message: "Server error while editing donation" });
   }
 };
-
 // ✅ Any authenticated user can view a single donation
 export const getDonation = async (req, res) => {
   try {

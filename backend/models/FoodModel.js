@@ -26,6 +26,7 @@ const donationSchema = new mongoose.Schema({
   },
   qty: {
     type: Number,
+    trim : true,
     required: true
   },
   prepTime: {

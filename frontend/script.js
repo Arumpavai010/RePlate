@@ -212,6 +212,12 @@ async function editDonation(donationId) {
   const newQty = prompt("Enter new quantity:");
   if (!newQty) return;
 
+  const parsedQty = parseInt(newQty, 10);
+  if (isNaN(parsedQty) || parsedQty <= 0) {
+    alert("Quantity must be a positive number");
+    return;
+  }
+
   try {
     if (!token) throw new Error("You must be logged in");
     const res = await fetch(`${API_URL}/donations/${donationId}/edit`, {
@@ -220,11 +226,11 @@ async function editDonation(donationId) {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
       },
-      body: JSON.stringify({ qty: parseInt(newQty, 10) })
+      body: JSON.stringify({ qty: parsedQty })
     });
 
     await handleResponse(res);
-    alert("Donation updated successfully!");
+    alert("Donation quantity updated successfully!");
     loadDonations();
   } catch (err) {
     alert("Error editing donation: " + err.message);
