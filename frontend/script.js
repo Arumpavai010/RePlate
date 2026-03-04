@@ -46,6 +46,7 @@ if (form) {
     };
 
     try {
+      if (!token) throw new Error("You must be logged in");
       const res = await fetch(`${API_URL}/donations`, {
         method: "POST",
         headers: {
@@ -68,7 +69,9 @@ if (form) {
 async function loadDonations() {
   const donationList = document.getElementById("donationList");
   if (!donationList) return;
+
   try {
+    if (!token) throw new Error("You must be logged in");
     const res = await fetch(`${API_URL}/donations`, {
       headers: { "Authorization": `Bearer ${token}` }
     });
@@ -97,6 +100,7 @@ async function loadDonations() {
           ? "donation-card expired"
           : `donation-card ${risk.toLowerCase()}`;
 
+      // Map link
       let mapLink = "";
       if (donation.lat !== null && donation.lon !== null) {
         mapLink = `
@@ -119,20 +123,26 @@ async function loadDonations() {
         statusBadge = `<span style="color:white; background:#f59e0b; padding:2px 8px; border-radius:6px;">REQUESTED</span>`;
       }
 
-      const statusDropdown = `
-        <label><b>Update Status:</b></label>
-        <select onchange="updateDonationStatus('${donation._id}', this.value)">
-          <option value="Pending" ${donation.status === "Pending" ? "selected" : ""}>Pending</option>
-          <option value="Requested" ${donation.status === "Requested" ? "selected" : ""}>Requested</option>
-          <option value="Collected" ${donation.status === "Collected" ? "selected" : ""}>Collected</option>
-        </select>
-      `;
-
-      const claimBtn = `<button onclick="claimDonation('${donation._id}')">Claim</button>`;
-
-      // ✅ Edit button only for the receiver who claimed this donation
+      // ✅ Role-aware controls
+      const role = localStorage.getItem("role");
       const userId = localStorage.getItem("userId");
-      const editBtn = donation.receiverId?._id === userId
+
+      const statusDropdown = role === "receiver"
+        ? `
+          <label><b>Update Status:</b></label>
+          <select onchange="updateDonationStatus('${donation._id}', this.value)">
+            <option value="Pending" ${donation.status === "Pending" ? "selected" : ""}>Pending</option>
+            <option value="Requested" ${donation.status === "Requested" ? "selected" : ""}>Requested</option>
+            <option value="Collected" ${donation.status === "Collected" ? "selected" : ""}>Collected</option>
+          </select>
+        `
+        : "";
+
+      const claimBtn = role === "receiver"
+        ? `<button onclick="claimDonation('${donation._id}')">Claim</button>`
+        : "";
+
+      const editBtn = role === "donor" && donation.donorId?._id === userId
         ? `<button onclick="editDonation('${donation._id}')">Edit</button>`
         : "";
 
@@ -161,6 +171,7 @@ async function loadDonations() {
 // Update Donation Status
 async function updateDonationStatus(donationId, newStatus) {
   try {
+    if (!token) throw new Error("You must be logged in");
     const res = await fetch(`${API_URL}/donations/${donationId}/status`, {
       method: "PUT",
       headers: {
@@ -181,6 +192,7 @@ async function updateDonationStatus(donationId, newStatus) {
 // Claim Donation
 async function claimDonation(donationId) {
   try {
+    if (!token) throw new Error("You must be logged in");
     const res = await fetch(`${API_URL}/donations/${donationId}/claim`, {
       method: "PUT",
       headers: {
@@ -201,6 +213,7 @@ async function editDonation(donationId) {
   if (!newQty) return;
 
   try {
+    if (!token) throw new Error("You must be logged in");
     const res = await fetch(`${API_URL}/donations/${donationId}/edit`, {
       method: "PUT",
       headers: {
@@ -249,7 +262,7 @@ async function getLocation() {
 
     try {
       const res = await fetch(
-             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
       );
       const data = await res.json();
 
@@ -265,6 +278,7 @@ async function getLocation() {
   });
 }
 
+// Donor Page: Load My Donations
 async function loadMyDonations() {
   const myDonationList = document.getElementById("myDonationList");
   if (!myDonationList) return;
@@ -272,6 +286,7 @@ async function loadMyDonations() {
   const userId = localStorage.getItem("userId"); // ✅ logged-in donor ID
 
   try {
+    if (!token) throw new Error("You must be logged in");
     const res = await fetch(`${API_URL}/donations`, {
       headers: { "Authorization": `Bearer ${token}` }
     });
@@ -282,9 +297,9 @@ async function loadMyDonations() {
     console.log("Logged-in userId:", userId);
 
     // ✅ Filter only donations created by this donor
-const myDonations = donations.filter(d =>
-  d.donorId === userId || (d.donorId && d.donorId._id === userId)
-);
+    const myDonations = donations.filter(d =>
+      d.donorId === userId || (d.donorId && d.donorId._id === userId)
+    );
 
     if (myDonations.length === 0) {
       myDonationList.innerHTML =
