@@ -123,7 +123,13 @@ async function loadDonations() {
         statusBadge = `<span style="color:white; background:#f59e0b; padding:2px 8px; border-radius:6px;">REQUESTED</span>`;
       }
 
-      // ✅ Role-aware controls
+      // ✅ Show claimed by if receiverId exists
+      let claimedBy = "";
+      if (donation.receiverId) {
+        claimedBy = `<p><b>Claimed by:</b> ${donation.receiverId.username || donation.receiverId}</p>`;
+      }
+
+      // Role-aware controls
       const role = localStorage.getItem("role");
       const userId = localStorage.getItem("userId");
 
@@ -155,6 +161,7 @@ async function loadDonations() {
         <p><b>Expires in:</b> ${hoursLeft > 0 ? hoursLeft.toFixed(1) + " hrs" : "Expired"}</p>
         <p><b>Risk Level:</b> ${risk}</p>
         <p><b>Status:</b> ${statusBadge}</p>
+        ${claimedBy}
         ${mapLink}
         ${statusDropdown}
         ${claimBtn}
@@ -195,9 +202,7 @@ async function claimDonation(donationId) {
     if (!token) throw new Error("You must be logged in");
     const res = await fetch(`${API_URL}/donations/${donationId}/claim`, {
       method: "PUT",
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
+      headers: { "Authorization": `Bearer ${token}` }
     });
     await handleResponse(res);
     alert("Donation claimed successfully!");
@@ -207,7 +212,7 @@ async function claimDonation(donationId) {
   }
 }
 
-// ✅ Edit Donation
+// Edit Donation
 async function editDonation(donationId) {
   const newQty = prompt("Enter new quantity:");
   if (!newQty) return;
@@ -298,10 +303,6 @@ async function loadMyDonations() {
     });
     const donations = await handleResponse(res);
 
-    // 🔎 Debug logs
-    console.log("Fetched donations:", donations);
-    console.log("Logged-in userId:", userId);
-
     // ✅ Filter only donations created by this donor
     const myDonations = donations.filter(d =>
       d.donorId === userId || (d.donorId && d.donorId._id === userId)
@@ -326,6 +327,12 @@ async function loadMyDonations() {
           ? "donation-card expired"
           : `donation-card ${risk.toLowerCase()}`;
 
+      // ✅ Show claimed by if receiverId exists
+      let claimedBy = "";
+      if (donation.receiverId) {
+        claimedBy = `<p><b>Claimed by:</b> ${donation.receiverId.username || donation.receiverId}</p>`;
+      }
+
       card.innerHTML = `
         <h3>${donation.food}</h3>
         <p><b>Quantity:</b> ${donation.qty} meals</p>
@@ -333,6 +340,7 @@ async function loadMyDonations() {
         <p><b>Expires in:</b> ${hoursLeft > 0 ? hoursLeft.toFixed(1) + " hrs" : "Expired"}</p>
         <p><b>Risk Level:</b> ${risk}</p>
         <p><b>Status:</b> ${donation.status}</p>
+        ${claimedBy}
         <button onclick="editDonation('${donation._id}')">Edit</button>
       `;
 
