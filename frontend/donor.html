@@ -3,16 +3,24 @@
 <head>
   <title>Donor - Food Donation</title>
   <link rel="stylesheet" href="style.css">
-  <script>
-    // ✅ Redirect if not logged in
-    (function checkAuth() {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("Please log in first.");
-        window.location.href = "loginPage.html";
-      }
-    })();
-  </script>
+<script>
+(function checkAuth() {
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+
+  if (!token) {
+    alert("Please log in first.");
+    window.location.href = "loginPage.html";
+    return;
+  }
+
+  if (role !== "donor") {
+    alert("You are not authorized to view the Donor page.");
+    window.location.href = "receiver.html";
+    return;
+  }
+})();
+</script>
 </head>
 <body>
 <header>
@@ -66,11 +74,11 @@
 </section>
 
 <script src="script.js"></script>
+
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    // ✅ Only run after page is fully loaded
-    loadMyDonations();
-  });
+document.addEventListener("DOMContentLoaded", () => {
+  loadMyDonations();
+});
 </script>
 
 </body>
