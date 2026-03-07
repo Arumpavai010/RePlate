@@ -74,11 +74,11 @@ REPLATE/
    MONGO_URI= your_mongodb_cluster_uri
    JWT_SECRET=your_secret_token
 
-4. Run backend and frontend
+4. Run backend and frontend (To run locally)
    - Start backend:
    - npm run dev
    - Backend runs on http://localhost:4000
-   - Start frontend: Open frontend/homePage.html with Live Server in VS Code
+   - Start frontend: Open frontend/index.html with Live Server in VS Code
 Frontend runs on http://127.0.0.1:5500 (default Live Server port)
 
 ## 🚀 Deployment :
