@@ -32,6 +32,17 @@ async function loadAllDonations() {
     donations.forEach(donation => {
       const card = document.createElement("div");
       card.className = "donation-card";
+      
+    let currentRating = 0;
+    if (typeof donation.rating === "number") {
+      currentRating = donation.rating;
+    } else if (donation.rating?.value) {
+      currentRating = donation.rating.value;
+    }
+
+    const ratingDisplay = currentRating > 0
+      ? `<p><b>Rating:</b> <span class="rating-stars">${"⭐".repeat(currentRating)}</span></p>`
+      : `<p><b>Rating:</b> Not yet rated</p>`;
 
       card.innerHTML = `
         <h3>${donation.food}</h3>
@@ -46,6 +57,7 @@ async function loadAllDonations() {
         }</p>
         <p><b>Status:</b> ${donation.status}</p>
         <p><b>Claimed By:</b> ${donation.receiverId?.username || "Not yet claimed"}</p>
+        ${ratingDisplay}
         ${donation.lat && donation.lon ? 
           `<p><a href="https://www.google.com/maps/search/?api=1&query=${donation.lat},${donation.lon}" target="_blank">View on Map</a></p>` : ""}
       `;
