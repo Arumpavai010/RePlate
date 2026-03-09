@@ -153,9 +153,10 @@ async function loadDonations() {
         : "";
 
       const currentRating = donation.rating?.value || 0;
-      const ratingDisplay = currentRating > 0 
-        ? `<p><b>Rating:</b> <span class="rating-stars">${"⭐".repeat(currentRating)}</span></p>` 
-        : "";
+
+      const ratingDisplay = currentRating > 0
+        ? `<p><b>Rating:</b> <span class="rating-stars">${"⭐".repeat(currentRating)}</span></p>`
+        : `<p><b>Rating:</b> Not yet rated</p>`;
 
       let ratingControls = "";
       if (role === "receiver" && donation.receiverId?._id === userId && currentRating === 0) {
