@@ -54,6 +54,17 @@ const donationSchema = new mongoose.Schema({
   claimedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User"
-}},{ timestamps: true });
+  },
+  rating: {
+     userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User" },
+     value: {
+      type: Number,
+      min: 1,
+      max: 5 
+      }}
+
+},{ timestamps: true });
 
 export default mongoose.model("Donation", donationSchema);

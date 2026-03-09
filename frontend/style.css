@@ -247,3 +247,12 @@ header{
   padding: 6px 12px;
   cursor: pointer;
 }
+
+  .rating-stars {
+    font-size: 18px;
+    color: gold;
+     cursor: pointer;
+  }
+  .donation-card select {
+    margin-top: 5px;
+  }

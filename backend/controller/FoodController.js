@@ -152,3 +152,25 @@ export const getDonation = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const rateDonation = async (req, res) => {
+  const { rating } = req.body;
+  try {
+    const donation = await Donation.findById(req.params.id);
+    if (!donation) return res.status(404).json({ message: "Donation not found" });
+
+    if (!donation.receiverId || donation.receiverId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Only the claiming receiver can rate this donation" });
+    }
+
+    if (donation.rating && donation.rating.value) {
+      return res.status(400).json({ message: "Rating already submitted" });
+    }
+
+    donation.rating = { userId: req.user.id, value: rating };
+    await donation.save();
+    res.json(donation);
+  } catch (err) {
+    res.status(500).json({ message: "Error updating rating" });
+  }
+};

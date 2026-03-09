@@ -1,5 +1,5 @@
 import express from "express";
-import {createDonation,getDonations,claimDonation,EditDonation,getDonation,updateDonationStatus} from "../controller/FoodController.js";
+import {createDonation,getDonations,claimDonation,EditDonation,getDonation,updateDonationStatus,rateDonation} from "../controller/FoodController.js";
 import { authMiddleware } from "../middleware/auth.js";
 
 const router = express.Router();
@@ -30,5 +30,8 @@ router.put("/:id/claim", authMiddleware, requireRole("receiver"), claimDonation)
 
 // Receivers can update status of claimed donations
 router.put("/:id/status", authMiddleware, requireRole("receiver"), updateDonationStatus);
+
+// Rating which can be given by the receiver only
+router.put("/:id/rating", authMiddleware, requireRole("receiver"), rateDonation);
 
 export default router;
