@@ -152,31 +152,26 @@ async function loadDonations() {
         ? `<button onclick="editDonation('${donation._id}')">Edit</button>`
         : "";
 
-      const currentRating = donation.rating?.value || 0;  // rating is an object { userId, value }
+      const currentRating = donation.rating?.value || 0;
       const ratingDisplay = currentRating > 0 
         ? `<p><b>Rating:</b> <span class="rating-stars">${"⭐".repeat(currentRating)}</span></p>` 
         : "";
 
-    let ratingControls = "";
-    if (role === "receiver" && donation.receiverId?._id === userId) {
-      if (currentRating > 0) {
-        // ✅ Already rated → show stars only, no dropdown
-        ratingControls = `<p><b>Your Rating:</b> <span class="rating-stars">${"⭐".repeat(currentRating)}</span></p>`;
-      } else {
-    // ✅ Not yet rated → show dropdown
-    ratingControls = `
-      <label><b>Rate this donation:</b></label>
-      <select onchange="rateDonation('${donation._id}', this.value)">
-        <option value="0">Select</option>
-        <option value="1">⭐</option>
-        <option value="2">⭐⭐</option>
-        <option value="3">⭐⭐⭐</option>
-        <option value="4">⭐⭐⭐⭐</option>
-        <option value="5">⭐⭐⭐⭐⭐</option>
-      </select>
-    `;
-  }
-}
+      let ratingControls = "";
+      if (role === "receiver" && donation.receiverId?._id === userId && currentRating === 0) {
+        ratingControls = `
+          <label><b>Rate this donation:</b></label>
+          <select onchange="rateDonation('${donation._id}', this.value)">
+            <option value="0">Select</option>
+            <option value="1">⭐</option>
+            <option value="2">⭐⭐</option>
+            <option value="3">⭐⭐⭐</option>
+            <option value="4">⭐⭐⭐⭐</option>
+            <option value="5">⭐⭐⭐⭐⭐</option>
+          </select>
+        `;
+      }
+
       card.innerHTML = `
         <h3>${donation.food}</h3>
         <p><b>Donor:</b> ${donation.donor}</p>
@@ -203,7 +198,7 @@ async function loadDonations() {
 }
 
 async function rateDonation(donationId, rating) {
-  if (!token || isTokenExpired(token)) {
+  if (!token) {
     alert("Your session has expired. Please log in again.");
     return;
   }
